@@ -10,7 +10,8 @@ let tweets = [];
 evenetListeners();
 
 function evenetListeners() {
-    contentFormulario.addEventListener('submit', agregarTweet)
+    contentFormulario.addEventListener('submit', agregarTweet);
+    document.addEventListener('DOMContentLoaded', getLocalStorage);
 }
 
 
@@ -42,6 +43,10 @@ function agregarTweet(e) {
 
     crearHTML();
 
+    //funcion para agregar la informacion en el localStorage
+
+    tweetsLocalStorage();
+
     //Reiniciar el formulario
     contentFormulario.reset();
 }
@@ -49,20 +54,54 @@ function agregarTweet(e) {
 //funcion para crear HTML
 
 function crearHTML() {
-
+    borrarHtml();
     if (tweets.length > 0) {
 
         tweets.forEach(tweet => {
+            //Crear boton de eliminar
+            const deleteTweet = document.createElement('a');
+            deleteTweet.classList.add('borrar-tweet');
+            deleteTweet.textContent = 'x';
+
+            deleteTweet.onclick = () => {
+                deleteTweetLocalStorage(tweet.id);
+            }
+
             //Crear el HTML
             const liTweet = document.createElement('li');
             //Añadir el texto
             liTweet.textContent = tweet.tweet;
+            liTweet.appendChild(deleteTweet);
+
             contentListarTweets.appendChild(liTweet);
 
-        })
-    }
 
+        });
+    }
+    tweetsLocalStorage();
 }
+
+//funcion para almacenar datos en el localStorage
+
+function tweetsLocalStorage(){
+    localStorage.setItem('tweets', JSON.stringify(tweets));
+}
+
+//funcion para extraer los datos del localStorage al HTML
+
+function getLocalStorage(){
+    tweets = JSON.parse( localStorage.getItem('tweets')) || [];
+    crearHTML();
+    console.log(tweets);
+}
+
+//funcion para eliminar tweet del localSotarge y del HTML
+function deleteTweetLocalStorage(id) {
+    tweets = tweets.filter(tweet => tweet.id != id);
+    console.log(tweets);
+    crearHTML();
+}
+
 
 //funcion para limpiar html anterior
 function borrarHtml() {
